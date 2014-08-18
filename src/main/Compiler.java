@@ -10,7 +10,6 @@ import se.mistas.parsing.pipeline.Pipeline;
 
 public class Compiler {
 	public static void main(String[] args) {
-
 		StringBuilder b = new StringBuilder();
 		InputStreamReader in = new InputStreamReader(Compiler.class.getResourceAsStream("/Grammar.txt"));
 

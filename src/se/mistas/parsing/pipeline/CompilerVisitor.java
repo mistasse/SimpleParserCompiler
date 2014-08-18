@@ -492,7 +492,6 @@ public class CompilerVisitor implements NodeVisitor, Opcodes {
 	
 	public void compile(StringPlaceholder sp) {
 		Label ok = new Label();
-		
 		mv.visitVarInsn(ALOAD, 0);
 		mv.visitFieldInsn(GETFIELD, name(), "string", "Ljava/lang/String;");
 		mv.visitLdcInsn(sp.str);
@@ -501,18 +500,17 @@ public class CompilerVisitor implements NodeVisitor, Opcodes {
 		mv.visitJumpInsn(IFNE, ok); //startswith = 1 != 0
 		mv.visitInsn(ACONST_NULL);
 		mv.visitInsn(ARETURN);
-		
+
 		mv.visitLabel(ok);
 		mv.visitTypeInsn(NEW, state());
 		mv.visitInsn(DUP);
-		
+
 		mv.visitTypeInsn(NEW, leaf());
 		mv.visitInsn(DUP);
 		mv.visitMethodInsn(INVOKESPECIAL, leaf(), "<init>", "()V", false);
-		
-		mv.visitLdcInsn(sp.str);
-		mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/String", "length", "()I", false);
-		
+
+		mv.visitIntInsn(SIPUSH, sp.str.length());
+
 		mv.visitMethodInsn(INVOKESPECIAL, state(), "<init>", "(L"+nodeInterface()+";I)V", false);
 
 		mv.visitInsn(ARETURN);
@@ -640,5 +638,5 @@ public class CompilerVisitor implements NodeVisitor, Opcodes {
 	public byte[] bytecode() {
 		return cw.toByteArray();
 	}
-
+	
 }
