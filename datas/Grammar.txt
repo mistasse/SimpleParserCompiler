@@ -1,0 +1,68 @@
+@Class("se/CustomParser")
+@State("se/mistas/parsing/nodes/State")
+@Node("se/mistas/parsing/nodes/Node")
+@Optional("se/mistas/parsing/nodes/OptionalNode")
+@Leaf("se/mistas/parsing/nodes/LeafNode")
+@Array("se/mistas/parsing/nodes/ArrayNode")
+@Package("se/mistas/parsing/nodes")
+
+constant := /(\,|[a-z][a-zA-Z0-9]*)/ ~ IdentifierNode % Matched in compiler
+structure := /[A-Z][a-zA-Z0-9]*/ ~ StructureIdentifierNode % Matched in compiler
+
+word := /[a-zA-Z]+/ ~ TerminalNode
+
+regex := until(/) ~ TerminalNode % reported in Regex
+flags := /[a-zA-Z]*/ ~ TerminalNode
+
+sinquoted := until(') ~ StringNode
+doubquoted := until(") ~ StringNode
+untilchar := /./  ~ UntilNode
+
+, := /\s*((%[^\n]*)*\s*)*/
+
+%% WITHOUT SPACES
+|Option:
+		"@" !word "(" !String ")"
+	~ OptionNode
+|String:
+	alt(
+		"'" !sinquoted  "'" |
+		"\"" !doubquoted "\""
+	)
+|Regex:
+		"/" !regex "/" !flags
+	~ RegexNode
+|Until:
+		"until(" !untilchar ")"
+%% SPACED
+|Assignment:
+		!constant , ":=" , !Value !opt(, "~" , !word)
+	~ AssignmentNode
+|Alt:
+		"alt(" , !Phrase , !mult("|" , !Phrase , ) ")"
+	~ AltNode
+|Mult:
+		"mult(" , !Phrase , ")"
+	~ MultNode
+|Opt:
+		"opt(" , !Phrase , ")"
+	~ OptNode
+|Phrase:
+		!Element , !mult(!Element , ) !opt("~" , !word)
+	~ PhraseNode
+|Element:
+		!opt("!") !alt( Combinator | Value | structure | constant )
+	~ ElementNode
+|Structure:
+		"|" !structure , ":" , !Phrase
+	~ StructureNode
+|CodeBlock:
+		, !mult(!Statement , )
+	~ CodeBlockNode
+%% CHOICES
+|Combinator:
+	alt( Alt | Mult | Opt )
+|Value:
+	alt( Regex | String | Until ) ~ RawNode
+|Statement:
+	alt( Structure | Assignment | Option )
