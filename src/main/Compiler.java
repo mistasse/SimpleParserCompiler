@@ -37,7 +37,6 @@ public class Compiler {
 		try {
 			fs = new FileOutputStream("datas/"+p1.hv.config.get("Class")+".class");
 			fs.write(p1.compile());
-			System.out.println(p1.compile().length);
 			fs.close();
 			System.out.println(t1);
 		} catch (IOException e) {

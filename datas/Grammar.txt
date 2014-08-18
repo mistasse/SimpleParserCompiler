@@ -22,42 +22,42 @@ untilchar := /./  ~ UntilNode
 
 %% WITHOUT SPACES
 |Option:
-		"@" !word "(" !String ")"
+		"@"> !word "(" !String ")"
 	~ OptionNode
 |String:
 	alt(
-		"'" !sinquoted  "'" |
-		"\"" !doubquoted "\""
+		"'"> !sinquoted  "'" |
+		"\""> !doubquoted "\""
 	)
 |Regex:
-		"/" !regex "/" !flags
+		"/"> !regex "/" !flags
 	~ RegexNode
 |Until:
-		"until(" !untilchar ")"
+		"until("> !untilchar ")"
 %% SPACED
 |Assignment:
 		!constant , ":=" , !Value !opt(, "~" , !word)
 	~ AssignmentNode
 |Alt:
-		"alt(" , !Phrase , !mult("|" , !Phrase , ) ")"
+		"alt("> , !Phrase , !mult("|" , !Phrase , ) ")"
 	~ AltNode
 |Mult:
-		"mult(" , !Phrase , ")"
+		"mult("> , !Phrase , ")"
 	~ MultNode
 |Opt:
-		"opt(" , !Phrase , ")"
+		"opt("> , !Phrase , ")"
 	~ OptNode
 |Phrase:
 		!Element , !mult(!Element , ) !opt("~" , !word)
 	~ PhraseNode
 |Element:
-		!opt("!") !alt( Combinator | Value | structure | constant )
+		!opt("!") !alt( Combinator | Value | structure | constant ) !opt(">")
 	~ ElementNode
 |Structure:
-		"|" !structure , ":" , !Phrase
+		"|"> !structure , ":" , !Phrase
 	~ StructureNode
 |CodeBlock:
-		, !mult(!Statement , )
+		, !mult(!Statement , ) 
 	~ CodeBlockNode
 %% CHOICES
 |Combinator:

@@ -31,6 +31,7 @@ public class CompilerVisitor implements NodeVisitor, Opcodes {
 	private ClassWriter cw;
 	private MethodVisitor init, mv;
 	private int locals, offset = 1;
+	private String method;
 
 	public CompilerVisitor(Pipeline p) {
 		this.p = p;
@@ -39,6 +40,7 @@ public class CompilerVisitor implements NodeVisitor, Opcodes {
 	@Override
 	public void visit(StructureNode sn) {
 		mv = cw.visitMethod(ACC_PUBLIC, sn.name, "(I)L"+state()+";", null, null);
+		method = sn.name;
 		// On place la string en local$0
 		locals = 2;
 		
@@ -52,6 +54,8 @@ public class CompilerVisitor implements NodeVisitor, Opcodes {
 
 	@Override
 	public void visit(PhraseNode pn) {
+		boolean error = false;
+		Label err = new Label();
 		Label end = new Label();
 //		Si plus qu'un, on cree un array. Sinon, si c'est just un, on retourne le state du dessus, et sinon,
 //		On garde en memoire la longueur associee au combinateur
@@ -84,10 +88,15 @@ public class CompilerVisitor implements NodeVisitor, Opcodes {
 			
 			for(ElementNode en : pn.elements) {
 				en.accept(this);
-//				mv.visitInsn(ACONST_NULL);
 				mv.visitInsn(DUP);
 				
-				mv.visitJumpInsn(IFNULL, end);
+				if(error)
+					mv.visitJumpInsn(IFNULL, err);
+				else
+					mv.visitJumpInsn(IFNULL, end);
+				
+				if(en.error)
+					error = true;
 				
 				if(en.goesOut) {
 					mv.visitInsn(DUP);
@@ -119,6 +128,18 @@ public class CompilerVisitor implements NodeVisitor, Opcodes {
 				mv.visitMethodInsn(INVOKEVIRTUAL, state(), "setNode", "(L"+nodeInterface()+";)L"+state()+";", false);
 			}
 			
+			if(error) {
+				mv.visitJumpInsn(GOTO, end);
+				mv.visitLabel(err);
+				mv.visitFrame(0, 0, new Object[0], 0, new Object[0]);
+				
+				mv.visitTypeInsn(NEW, exception());
+				mv.visitInsn(DUP);
+				mv.visitLdcInsn("A structure "+method+" was attempted");
+				mv.visitMethodInsn(INVOKESPECIAL, exception(), "<init>", "(Ljava/lang/String;)V", false);
+				mv.visitInsn(ATHROW);
+			}
+			
 			mv.visitLabel(end);
 			mv.visitFrame(0, 0, new Object[0], 0, new Object[0]);
 			
@@ -148,7 +169,13 @@ public class CompilerVisitor implements NodeVisitor, Opcodes {
 				en.accept(this);
 //				mv.visitInsn(ACONST_NULL);
 				mv.visitInsn(DUP);
-				mv.visitJumpInsn(IFNULL, end);
+				if(error)
+					mv.visitJumpInsn(IFNULL, err);
+				else
+					mv.visitJumpInsn(IFNULL, end);
+				
+				if(en.error)
+					error = true;
 				
 				if(en.goesOut)
 					mv.visitInsn(DUP);
@@ -193,6 +220,17 @@ public class CompilerVisitor implements NodeVisitor, Opcodes {
 			mv.visitVarInsn(ILOAD, oldOffset);
 			mv.visitInsn(ISUB);
 			mv.visitMethodInsn(INVOKESPECIAL, state(), "<init>", "(L"+nodeInterface()+";I)V", false);
+			if(error) {
+				mv.visitJumpInsn(GOTO, end);
+				mv.visitLabel(err);
+				mv.visitFrame(0, 0, new Object[0], 0, new Object[0]);
+				
+				mv.visitTypeInsn(NEW, exception());
+				mv.visitInsn(DUP);
+				mv.visitLdcInsn("A structure "+method+" was attempted");
+				mv.visitMethodInsn(INVOKESPECIAL, exception(), "<init>", "(Ljava/lang/String;)V", false);
+				mv.visitInsn(ATHROW);
+			}
 			
 			mv.visitLabel(end);
 			mv.visitFrame(0, 0, new Object[0], 0, new Object[0]);
@@ -502,6 +540,7 @@ public class CompilerVisitor implements NodeVisitor, Opcodes {
 		mv.visitInsn(ARETURN);
 
 		mv.visitLabel(ok);
+		mv.visitFrame(0, 0, new Object[0], 0, new Object[0]);
 		mv.visitTypeInsn(NEW, state());
 		mv.visitInsn(DUP);
 
@@ -633,6 +672,11 @@ public class CompilerVisitor implements NodeVisitor, Opcodes {
 	
 	public String fieldName(Placeholder ph) {
 		return "field$"+p.hv.constants.indexOf(ph);
+	}
+	
+	public String exception() {
+		String r = p.hv.config.get("Exception");
+		return r == null ? "java/lang/RuntimeException" : r;
 	}
 	
 	public byte[] bytecode() {
