@@ -4,6 +4,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 
+import se.mistas.parsing.compilation.ParsingException;
 import se.mistas.parsing.nodes.OmniNode;
 import se.mistas.parsing.nodes.State;
 import se.mistas.parsing.pipeline.Pipeline;
@@ -27,7 +28,11 @@ public class Compiler {
 //		se.mistas.parsing.generated.CustomParser parser = new se.mistas.parsing.generated.CustomParser(b.toString());
 		long t1 = System.currentTimeMillis();
 		for(int i = 0; i < 1; i++)
-			s = parser.CodeBlock(0);
+			try {
+				s = parser.CodeBlock(0);
+			} catch (ParsingException e) {
+				System.err.println("Error in block "+e.structure+" at line "+b.toString().substring(0, e.offset).split("\n").length);
+			}
 		t1 = System.currentTimeMillis() - t1;
 		if(s.length() != b.length())
 			throw new RuntimeException("Parsing failed!");

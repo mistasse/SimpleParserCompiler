@@ -39,7 +39,7 @@ public class CompilerVisitor implements NodeVisitor, Opcodes {
 	
 	@Override
 	public void visit(StructureNode sn) {
-		mv = cw.visitMethod(ACC_PUBLIC, sn.name, "(I)L"+state()+";", null, null);
+		mv = cw.visitMethod(ACC_PUBLIC, sn.name, "(I)L"+state()+";", null, new String[]{exception()});
 		method = sn.name;
 		// On place la string en local$0
 		locals = 2;
@@ -135,8 +135,9 @@ public class CompilerVisitor implements NodeVisitor, Opcodes {
 				
 				mv.visitTypeInsn(NEW, exception());
 				mv.visitInsn(DUP);
-				mv.visitLdcInsn("A structure "+method+" was attempted");
-				mv.visitMethodInsn(INVOKESPECIAL, exception(), "<init>", "(Ljava/lang/String;)V", false);
+				mv.visitLdcInsn(method);
+				mv.visitVarInsn(ILOAD, offset);
+				mv.visitMethodInsn(INVOKESPECIAL, exception(), "<init>", "(Ljava/lang/String;I)V", false);
 				mv.visitInsn(ATHROW);
 			}
 			
@@ -227,8 +228,9 @@ public class CompilerVisitor implements NodeVisitor, Opcodes {
 				
 				mv.visitTypeInsn(NEW, exception());
 				mv.visitInsn(DUP);
-				mv.visitLdcInsn("A structure "+method+" was attempted");
-				mv.visitMethodInsn(INVOKESPECIAL, exception(), "<init>", "(Ljava/lang/String;)V", false);
+				mv.visitLdcInsn(method);
+				mv.visitVarInsn(ILOAD, offset);
+				mv.visitMethodInsn(INVOKESPECIAL, exception(), "<init>", "(Ljava/lang/String;I)V", false);
 				mv.visitInsn(ATHROW);
 			}
 			
@@ -675,8 +677,7 @@ public class CompilerVisitor implements NodeVisitor, Opcodes {
 	}
 	
 	public String exception() {
-		String r = p.hv.config.get("Exception");
-		return r == null ? "java/lang/RuntimeException" : r;
+		return p.hv.config.get("Exception");
 	}
 	
 	public byte[] bytecode() {
