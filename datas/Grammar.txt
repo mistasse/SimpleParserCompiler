@@ -1,4 +1,4 @@
-@Class("se/CustomParser")
+@Class("se/mistas/parsing/generated/SimpleParserCompiler")
 @Exception("se/mistas/parsing/compilation/ParsingException")
 @State("se/mistas/parsing/nodes/State")
 @Node("se/mistas/parsing/nodes/Node")

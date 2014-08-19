@@ -8,7 +8,7 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 
 import se.mistas.parsing.compilation.ParsingException;
-import se.mistas.parsing.generated.ParserCompiler;
+import se.mistas.parsing.generated.SimpleParserCompiler;
 import se.mistas.parsing.nodes.CodeBlockNode;
 import se.mistas.parsing.nodes.State;
 import se.mistas.parsing.pipeline.Pipeline;
@@ -28,8 +28,7 @@ public class Main {
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
-		
-		ParserCompiler parser = new ParserCompiler(b.toString());
+		SimpleParserCompiler parser = new SimpleParserCompiler(b.toString());
 		try {
 			State s = parser.CodeBlock(0);
 			if(s.length() != b.length())

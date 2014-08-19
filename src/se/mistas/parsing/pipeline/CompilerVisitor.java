@@ -405,7 +405,7 @@ public class CompilerVisitor implements NodeVisitor, Opcodes {
 	@Override
 	public void visit(CodeBlockNode cbn) {
 		cw = new ClassWriter(ClassWriter.COMPUTE_FRAMES | ClassWriter.COMPUTE_MAXS);
-		cw.visit(V1_7 , ACC_PUBLIC | ACC_SUPER, name(), null, "java/lang/Object", null);
+		cw.visit(V1_6 , ACC_PUBLIC | ACC_SUPER, name(), null, "java/lang/Object", null);
 		
 		cw.visitField(ACC_PRIVATE | ACC_FINAL, "string", "Ljava/lang/String;", null, null).visitEnd();
 		
