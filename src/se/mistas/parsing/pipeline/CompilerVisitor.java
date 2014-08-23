@@ -316,6 +316,7 @@ public class CompilerVisitor implements NodeVisitor, Opcodes {
 		mv.visitMethodInsn(INVOKEVIRTUAL, "java/util/LinkedList", "size", "()I", false);
 		mv.visitTypeInsn(ANEWARRAY, nodeInterface());
 		mv.visitMethodInsn(INVOKEVIRTUAL, "java/util/LinkedList", "toArray", "([Ljava/lang/Object;)[Ljava/lang/Object;", false);
+		mv.visitTypeInsn(CHECKCAST, "[L"+nodeInterface()+";");
 		// array
 		
 		mv.visitTypeInsn(NEW, array());

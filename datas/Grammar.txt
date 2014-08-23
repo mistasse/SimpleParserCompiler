@@ -11,6 +11,7 @@ constant := /(\,|[a-z][a-zA-Z0-9]*)/ ~ IdentifierNode % Matched in compiler
 structure := /[A-Z][a-zA-Z0-9]*/ ~ StructureIdentifierNode % Matched in compiler
 
 word := /[a-zA-Z]+/ ~ TerminalNode
+jname := /[a-zA-Z\$]+/ ~ TerminalNode
 
 regex := until(/) ~ TerminalNode % reported in Regex
 flags := /[a-zA-Z]*/ ~ TerminalNode
@@ -37,7 +38,7 @@ untilchar := /./  ~ UntilNode
 		"until("> !untilchar ")"
 %% SPACED
 |Assignment:
-		!constant , ":=" , !Value !opt(, "~" , !word)
+		!constant , ":=" , !Value !opt(, "~" , !jname)
 	~ AssignmentNode
 |Alt:
 		"alt("> , !Phrase , !mult("|" , !Phrase , ) ")"
@@ -49,7 +50,7 @@ untilchar := /./  ~ UntilNode
 		"opt("> , !Phrase , ")"
 	~ OptNode
 |Phrase:
-		!Element , !mult(!Element , ) !opt("~" , !word)
+		!Element , !mult(!Element , ) !opt("~" , !jname)
 	~ PhraseNode
 |Element:
 		!opt("!") !alt( Combinator | Value | structure | constant ) !opt(">")
