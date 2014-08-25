@@ -2,10 +2,11 @@ package se.mistas.parsing.nodes;
 
 public class State {
 	private Node n;
-	private int length;
+	private int offset, length;
 	
-	public State(Node n, int length) {
+	public State(Node n, int offset, int length) {
 		this.n = n;
+		this.offset = offset;
 		this.length = length;
 	}
 	
@@ -25,5 +26,14 @@ public class State {
 	
 	public int length() {
 		return length;
+	}
+	
+	public State setOffset(int offset) {
+		this.offset = offset;
+		return this;
+	}
+	
+	public int offset() {
+		return offset;
 	}
 }

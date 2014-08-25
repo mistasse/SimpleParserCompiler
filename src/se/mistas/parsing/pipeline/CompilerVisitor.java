@@ -217,10 +217,13 @@ public class CompilerVisitor implements NodeVisitor, Opcodes {
 				}
 				mv.visitMethodInsn(INVOKESPECIAL, filter(pn.type), "<init>", "("+b.toString()+")V", false);
 			}
+			
+			mv.visitVarInsn(ILOAD, oldOffset);
+			
 			mv.visitVarInsn(ILOAD, offset);
 			mv.visitVarInsn(ILOAD, oldOffset);
 			mv.visitInsn(ISUB);
-			mv.visitMethodInsn(INVOKESPECIAL, state(), "<init>", "(L"+nodeInterface()+";I)V", false);
+			mv.visitMethodInsn(INVOKESPECIAL, state(), "<init>", "(L"+nodeInterface()+";II)V", false);
 			if(error) {
 				mv.visitJumpInsn(GOTO, end);
 				mv.visitLabel(err);
@@ -328,11 +331,13 @@ public class CompilerVisitor implements NodeVisitor, Opcodes {
 		mv.visitInsn(DUP_X1); // state node state
 		mv.visitInsn(SWAP);
 		
+		mv.visitVarInsn(ILOAD, oldOffset);
+		
 		mv.visitVarInsn(ILOAD, offset); // state state node length
 		mv.visitVarInsn(ILOAD, oldOffset);
 		mv.visitInsn(ISUB);
 		
-		mv.visitMethodInsn(INVOKESPECIAL, state(), "<init>", "(L"+nodeInterface()+";I)V", false);
+		mv.visitMethodInsn(INVOKESPECIAL, state(), "<init>", "(L"+nodeInterface()+";II)V", false);
 		
 		mv.visitVarInsn(ILOAD, oldOffset);
 		mv.visitVarInsn(ISTORE, offset);
@@ -355,8 +360,9 @@ public class CompilerVisitor implements NodeVisitor, Opcodes {
 		mv.visitInsn(DUP);
 		mv.visitMethodInsn(INVOKESPECIAL, optional(), "<init>", "()V", false);
 		
+		mv.visitVarInsn(ILOAD, offset);
 		mv.visitInsn(ICONST_0);
-		mv.visitMethodInsn(INVOKESPECIAL, state(), "<init>", "(L"+nodeInterface()+";I)V", false);
+		mv.visitMethodInsn(INVOKESPECIAL, state(), "<init>", "(L"+nodeInterface()+";II)V", false);
 		
 		mv.visitLabel(okLabel);
 		mv.visitFrame(F_SAME, 0, new Object[]{}, 0, new Object[]{});
@@ -524,10 +530,12 @@ public class CompilerVisitor implements NodeVisitor, Opcodes {
 		
 		mv.visitMethodInsn(INVOKESPECIAL, leaf(), "<init>", "()V", false);
 		//state state node
+		mv.visitVarInsn(ILOAD, 1);
+		
 		mv.visitVarInsn(ILOAD, 2);
 		mv.visitVarInsn(ILOAD, 1);
 		mv.visitInsn(ISUB);
-		mv.visitMethodInsn(INVOKESPECIAL, state(), "<init>", "(L"+nodeInterface()+";I)V", false);
+		mv.visitMethodInsn(INVOKESPECIAL, state(), "<init>", "(L"+nodeInterface()+";II)V", false);
 		mv.visitInsn(ARETURN);
 	}
 	
@@ -550,10 +558,11 @@ public class CompilerVisitor implements NodeVisitor, Opcodes {
 		mv.visitTypeInsn(NEW, leaf());
 		mv.visitInsn(DUP);
 		mv.visitMethodInsn(INVOKESPECIAL, leaf(), "<init>", "()V", false);
-
+		
+		mv.visitVarInsn(ILOAD, offset);
 		mv.visitIntInsn(SIPUSH, sp.str.length());
 
-		mv.visitMethodInsn(INVOKESPECIAL, state(), "<init>", "(L"+nodeInterface()+";I)V", false);
+		mv.visitMethodInsn(INVOKESPECIAL, state(), "<init>", "(L"+nodeInterface()+";II)V", false);
 
 		mv.visitInsn(ARETURN);
 	}
@@ -626,10 +635,12 @@ public class CompilerVisitor implements NodeVisitor, Opcodes {
 		mv.visitInsn(DUP);
 		mv.visitMethodInsn(INVOKESPECIAL, leaf(), "<init>", "()V", false);
 		
+		mv.visitVarInsn(ILOAD, oldOffset);
+		
 		mv.visitVarInsn(ILOAD, offset);
 		mv.visitVarInsn(ILOAD, oldOffset);
 		mv.visitInsn(ISUB);
-		mv.visitMethodInsn(INVOKESPECIAL, state(), "<init>", "(L"+nodeInterface()+";I)V", false);
+		mv.visitMethodInsn(INVOKESPECIAL, state(), "<init>", "(L"+nodeInterface()+";II)V", false);
 
 		mv.visitVarInsn(ILOAD, oldOffset);
 		mv.visitVarInsn(ISTORE, offset);
