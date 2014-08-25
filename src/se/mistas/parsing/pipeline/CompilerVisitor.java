@@ -110,6 +110,9 @@ public class CompilerVisitor implements NodeVisitor, Opcodes {
 			}
 			
 			mv.visitVarInsn(ALOAD, state);
+			mv.visitVarInsn(ILOAD, oldOffset);
+			mv.visitMethodInsn(INVOKEVIRTUAL, state(), "setOffset", "(I)L"+state()+";", false);
+			
 			mv.visitVarInsn(ILOAD, offset);
 			mv.visitVarInsn(ILOAD, oldOffset);
 			mv.visitInsn(ISUB);
