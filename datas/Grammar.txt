@@ -7,7 +7,7 @@
 @Array("se/mistas/parsing/nodes/ArrayNode")
 @Package("se/mistas/parsing/nodes")
 
-constant := /(\,|[a-z][a-zA-Z0-9]*)/ ~ IdentifierNode % Matched in compiler
+constant := /(\,|;|[a-z][a-zA-Z0-9]*)/ ~ IdentifierNode % Matched in compiler
 structure := /[A-Z][a-zA-Z0-9]*/ ~ StructureIdentifierNode % Matched in compiler
 
 word := /[a-zA-Z]+/ ~ TerminalNode
@@ -21,6 +21,7 @@ doubquoted := until(") ~ StringNode
 untilchar := /./  ~ UntilNode
 
 , := /\s*((%[^\n]*)*\s*)*/
+; := /(\s+(%[^\n]*)|(%[^\n]*\s+))*/
 
 %% WITHOUT SPACES
 |Option:
